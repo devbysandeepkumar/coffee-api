@@ -1,5 +1,5 @@
 import { ChatMistralAI } from "@langchain/mistralai";
-import { tavilySearch } from "./tavily.service";
+import { tavilySearch } from "./tavily.service.ts";
 import { Annotation, END, START, StateGraph } from "@langchain/langgraph";
 import { z } from "zod";
 import { config } from "../config/config.env";

@@ -1,5 +1,5 @@
 import { request, response } from "express";
-import { findCoffee } from "../service/ai.service";
+import { findCoffee } from "../service/ai.service.ts";
 
 export const getCoffeeDetails = async (req: typeof request, res: typeof response): Promise<void> => {
   const { name } = req.query;
