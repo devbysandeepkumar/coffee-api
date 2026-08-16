@@ -5,17 +5,15 @@ import cors from "cors";
 const app = express();
 
 app.use(express.json());
-app.use(cors({
-  origin: "*",
-}));
+app.use(cors({ origin: "*" }));
 
 app.use("/api", router);
 
-if (process.env.VERCEL !== "1") {
+export default app;
+
+if (process.env.NODE_ENV !== "production") {
   const port = process.env.PORT || 3000;
   app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server running on http://localhost:${port}`);
   });
 }
-
-export default app;
