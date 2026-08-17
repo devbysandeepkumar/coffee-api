@@ -1,5 +1,5 @@
 import express from "express";
-import router from "./routes/search.route";
+import router from "./src/routes/search.route";
 import cors from "cors";
 const port = process.env.PORT || 3000;
 
