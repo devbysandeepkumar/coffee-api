@@ -99,7 +99,6 @@ Do not invent information when it can be determined from the search results.
   }
 }
 
-// Graph Definition
 const graph = new StateGraph(CoffeeState)
   .addNode("search", searchNode)
   .addNode("extract", extractNode)
@@ -110,15 +109,27 @@ const graph = new StateGraph(CoffeeState)
 const coffeeAgent = graph.compile();
 
 export async function findCoffee(coffeeName: string): Promise<Coffee | undefined> {
-  const result = await coffeeAgent.invoke({
-    coffeeName,
-    searchResults: "",
-    coffeeDetails: undefined,
-  });
+  const eventStream = coffeeAgent.streamEvents(
+    {
+      coffeeName,
+      searchResults: "",
+      coffeeDetails: undefined,
+    },
+    { version: "v2" }
+  );
 
-  if (!result.coffeeDetails) {
+  let finalState: { coffeeDetails?: Coffee } | undefined;
+
+  for await (const event of eventStream) {
+    // "on_chain_end" fires at the end of the whole graph run
+    if (event.event === "on_chain_end" && event.name === "LangGraph") {
+      finalState = event.data?.output;
+    }
+  }
+
+  if (!finalState?.coffeeDetails) {
     throw new Error("Failed to extract coffee details");
   }
 
-  return result.coffeeDetails;
+  return finalState.coffeeDetails;
 }
