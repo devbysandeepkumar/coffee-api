@@ -4,10 +4,6 @@ import { findCoffee } from "../service/ai.service";
 export const getCoffeeDetails = async (req: typeof request, res: typeof response): Promise<void> => {
   const { name } = req.query;
 
-   res.setHeader("Content-Type", "text/event-stream");
-   res.setHeader("Cache-Control", "no-cache");
-   res.setHeader("Connection", "keep-alive");
-
   if (!name || typeof name !== "string") {
     res.status(400).json({ error: "Coffee name must be a single string" });
     return;
