@@ -1,13 +1,19 @@
 import { ChatMistralAI } from "@langchain/mistralai";
-import { tavilySearch } from "./tavily.service";
+import { ChatCohere } from "@langchain/cohere";
+import { tavilySearch } from "./tavily.service.js";
 import { Annotation, END, START, StateGraph } from "@langchain/langgraph";
 import { z } from "zod";
-import { config } from "../config/config.env";
+import { config } from "../config/config.env.js";
 
-export const model = new ChatMistralAI({
-  model: "mistral-small-latest",
-  apiKey: config.MISTRAL_API_KEY,
-});
+// export const model = new ChatMistralAI({
+//   model: "mistral-small-latest",
+//   apiKey: config.MISTRAL_API_KEY,
+// });
+
+export const model = new ChatCohere({
+  model: "command-r7b-12-2024",
+  apiKey: config.COHERE_API_KEY,
+})
 
 const coffeeSchema = z.object({
   name: z.string().describe("The name of the coffee"),
@@ -26,6 +32,26 @@ const coffeeSchema = z.object({
 
 type Coffee = z.infer<typeof coffeeSchema>;
 
+function removeCohereAnnotations(value: string): string {
+  return value
+    .replace(/<co>([\s\S]*?)<\/co[^>]*>/gi, "$1")
+    .replace(/<\/?co[^>]*>/gi, "")
+    .trim();
+}
+
+function cleanCoffeeDetails(data: Coffee): Coffee {
+  return {
+    name: removeCohereAnnotations(data.name),
+    description: removeCohereAnnotations(data.description),
+    ingredients: data.ingredients.map(removeCohereAnnotations),
+    tools: data.tools.map(removeCohereAnnotations),
+    image: removeCohereAnnotations(data.image),
+    serving: removeCohereAnnotations(data.serving),
+    preparationTime: removeCohereAnnotations(data.preparationTime),
+    difficulty: removeCohereAnnotations(data.difficulty),
+  };
+}
+
 const CoffeeState = Annotation.Root({
   coffeeName: Annotation<string>(),
   searchResults: Annotation<string>(),
@@ -34,9 +60,13 @@ const CoffeeState = Annotation.Root({
 
 type GraphState = typeof CoffeeState.State;
 
-const structureModel = model.withStructuredOutput(coffeeSchema, {
-  name: "extract_coffee_info",
-});
+const structureModel = model.bindTools([
+  {
+    name: "extract_coffee_info",
+    description: "Extract structured coffee information from the search results.",
+    schema: coffeeSchema,
+  },
+]);
 
 async function searchNode(
   state: GraphState
@@ -85,7 +115,16 @@ Include:
 Do not invent information when it can be determined from the search results.
 `;
 
-    const data = await structureModel.invoke(prompt);
+    const response = await structureModel.invoke(prompt);
+    const toolCall = response.tool_calls?.find(
+      (call) => call.name === "extract_coffee_info"
+    );
+
+    if (!toolCall) {
+      throw new Error("Cohere did not return structured coffee data");
+    }
+
+    const data = cleanCoffeeDetails(coffeeSchema.parse(toolCall.args));
 
     return {
       coffeeDetails: {

@@ -15,3 +15,19 @@ A TypeScript backend that turns unstructured web data into structured coffee inf
 - **Agent framework**: LangChain
 - **Search**: Tavily API
 - **LLM**: Mistral AI
+
+## Run locally
+
+Create a `.env` file with `MISTRAL_API_KEY` and `TAVILY_API_KEY`, then run:
+
+```bash
+npm install
+npm start
+```
+
+The endpoint is available at `http://localhost:3000/api/search?name=latte`.
+The root URL returns a health response.
+
+## Deploy to Vercel
+
+Import this repository into Vercel and add `MISTRAL_API_KEY` and `TAVILY_API_KEY` as project environment variables. Vercel detects `api/index.ts` as the serverless entrypoint, so the deployed endpoint is `/api/search?name=latte`.

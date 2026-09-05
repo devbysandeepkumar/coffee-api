@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --noEmit",
+    "test": "npm run build",
     "start": "npx tsx index.ts"
   },
   "keywords": [],
@@ -19,6 +20,7 @@
     "typescript": "5.6.3"
   },
   "dependencies": {
+    "@langchain/cohere": "^1.1.0",
     "@langchain/langgraph": "^1.4.10",
     "@langchain/mistralai": "^1.2.0",
     "@tavily/core": "^0.7.7",

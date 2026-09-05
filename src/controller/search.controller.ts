@@ -1,7 +1,7 @@
-import { request, response } from "express";
-import { findCoffee } from "../service/ai.service";
+import { Request, Response } from "express";
+import { findCoffee } from "../service/ai.service.js";
 
-export const getCoffeeDetails = async (req: typeof request, res: typeof response): Promise<void> => {
+export const getCoffeeDetails = async (req: Request, res: Response): Promise<void> => {
   const { name } = req.query;
 
   if (!name || typeof name !== "string") {

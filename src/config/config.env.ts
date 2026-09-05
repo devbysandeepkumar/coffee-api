@@ -3,9 +3,14 @@ dotenv.config();
 
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
+const COHERE_API_KEY = process.env.COHERE_API_KEY;
 
 if (!MISTRAL_API_KEY) {
   throw new Error("MISTRAL_API_KEY is missing from .env");
+}
+
+if (!COHERE_API_KEY) {
+  throw new Error("COHERE_API_KEY is missing from .env");
 }
 
 if (!TAVILY_API_KEY) {
@@ -15,9 +20,11 @@ if (!TAVILY_API_KEY) {
 type Config = {
   readonly MISTRAL_API_KEY: string;
   readonly TAVILY_API_KEY: string;
+  readonly COHERE_API_KEY: string;
 };
 
 export const config: Config = {
   MISTRAL_API_KEY,
   TAVILY_API_KEY,
+  COHERE_API_KEY,
 };
