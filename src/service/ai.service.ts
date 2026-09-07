@@ -24,7 +24,7 @@ const coffeeSchema = z.object({
   tools: z
     .array(z.string())
     .describe("List of tools required to make the coffee"),
-  image: z.string().url().describe("URL of the coffee image"),
+  image: z.string().url().optional().default("https://devbysandeepkumar.github.io/coffee/assets/latte-BKqgAEJY.png"),
   serving: z.string().describe("Serving suggestions for the coffee"),
   preparationTime: z.string().describe("Preparation time for the coffee"),
   difficulty: z.string().describe("Difficulty level of making the coffee"),
